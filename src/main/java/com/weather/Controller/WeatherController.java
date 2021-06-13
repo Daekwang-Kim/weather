@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WeatherController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    WeatherService weatherService;
+    private WeatherService weatherService;
 
     @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<List<Weather>> getAllWeathers() {
@@ -62,6 +62,12 @@ public class WeatherController {
     @RequestMapping(value = "/saveWeather", method = RequestMethod.GET)
     public ResponseEntity<Weather> save(HttpServletRequest req, Weather Weather) {
         return new ResponseEntity<Weather>(weatherService.save(Weather), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "makeTodayWeather")
+    public ResponseEntity<List<Weather>> insertWeather() {
+        List<Weather> Weather = weatherService.insertWeather();;
+        return new ResponseEntity<List<Weather>>(Weather, HttpStatus.OK);
     }
 
 }
