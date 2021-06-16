@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface WeatherService {
     public List<Weather> findAll();
-    public Optional<Weather> findById(Long wtNo);
-    public void deleteById(Long wtNo);
+    public Optional<Weather> findByFcstDate(String fcstDate);
+    public void deleteByFcstDate(String fcstDate);
     public Weather save(Weather weather);
-    public void updateById(Long wtNo, Weather weather);
+    public void updateByFcstDate(String fcstDate, Weather weather);
 
     public List<Weather> insertWeather();
 }

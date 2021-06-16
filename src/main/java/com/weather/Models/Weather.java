@@ -11,47 +11,67 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "weather")
+@Table(indexes = {@Index(name = "idx_fcstDate",  columnList="fcstDate", unique = false)})
 public class Weather {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wtNo;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "category")
+    private WeatherCategories categories;
 
     @Column
-    private String id;
+    private String fcstDate;
 
     @Column
-    private String name;
+    private String fcstTime;
 
-    private Weather() { // 기본 생성자 추가 
+    @Column
+    private Long fcstValue;
+
+    public Weather() { // 기본 생성자 추가 
     }
 
-    public Weather(Long wtNo, String id, String name) {
-        this.wtNo = wtNo;
-        this.id = id;
-        this.name = name;
+    public WeatherCategories getCategories() {
+        return categories;
     }
 
-    public Long getWtNo() {
-        return wtNo;
+    public void setCategories(WeatherCategories categories) {
+        this.categories = categories;
     }
 
-    public void setWtNo(Long wtNo) {
-        this.wtNo = wtNo;
+    public String getFcstDate() {
+        return fcstDate;
     }
 
-    public String getId() {
-        return id;
+    public void setFcstDate(String fcstDate) {
+        this.fcstDate = fcstDate;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getFcstTime() {
+        return fcstTime;
     }
 
-    public String getName() {
-        return name;
+    public void setFcstTime(String fcstTime) {
+        this.fcstTime = fcstTime;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Long getFcstValue() {
+        return fcstValue;
     }
+
+    public void setFcstValue(Long fcstValue) {
+        this.fcstValue = fcstValue;
+    }
+
+    public Weather(WeatherCategories categories, String fcstDate, String fcstTime, Long fcstValue) {
+        this.categories = categories;
+        this.fcstDate = fcstDate;
+        this.fcstTime = fcstTime;
+        this.fcstValue = fcstValue;
+    }
+
+    
+    
 }

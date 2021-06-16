@@ -5,7 +5,6 @@ import com.weather.Repositories.WeatherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -33,13 +34,13 @@ public class WeatherServiceImpl implements WeatherService {
         return weathers;
     }
 
-    public Optional<Weather> findById(Long wtNo) {
-        Optional<Weather> weather = weatherRepository.findById(wtNo);
+    public Optional<Weather> findByFcstDate(String fcstDate) {
+        Optional<Weather> weather = weatherRepository.findByFcstDate(fcstDate);
         return weather;
     }
 
-    public void deleteById(Long wtNo) {
-        weatherRepository.deleteById(wtNo);
+    public void deleteByFcstDate(String fcstDate) {
+        weatherRepository.deleteByFcstDate(fcstDate);
     }
 
     public Weather save(Weather weather) {
@@ -47,12 +48,13 @@ public class WeatherServiceImpl implements WeatherService {
         return weather;
     }
 
-    public void updateById(Long wtNo, Weather weather) {
-        Optional<Weather> e = weatherRepository.findById(wtNo);
+    public void updateByFcstDate(String fcstDate, Weather weather) {
+        Optional<Weather> e = weatherRepository.findByFcstDate(fcstDate);
         if (e.isPresent()) {
-            e.get().setWtNo(weather.getWtNo());
-            e.get().setId(weather.getId());
-            e.get().setName(weather.getName());
+            e.get().setCategories(weather.getCategories());
+            e.get().setFcstDate(weather.getFcstDate());
+            e.get().setFcstTime(weather.getFcstTime());
+            e.get().setFcstValue(weather.getFcstValue());
             weatherRepository.save(weather);
         }
     }
@@ -61,17 +63,14 @@ public class WeatherServiceImpl implements WeatherService {
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String date = sdf.format(now);
-        String inputLine;
-        String buffer = "";
         
         List<Weather> weathers = new ArrayList<>();
         String url;
-        HttpURLConnection connection;
 
         StringBuffer params = new StringBuffer();
         try {
             params.append("?serviceKey=").append(SERVICE_KEY);
-            params.append("&numOfRows=").append("200");
+            params.append("&numOfRows=").append("50");
             params.append("&pageNo=").append("1");
             params.append("&base_date=").append(date);
             params.append("&base_time=").append("0500");
@@ -83,27 +82,44 @@ public class WeatherServiceImpl implements WeatherService {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             
             try {
+                Weather weather = new Weather();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 Document doc = dBuilder.parse(url.toString());
-
+                
                 doc.getDocumentElement().normalize();
-                System.out.println(doc.getDocumentElement().getNodeName());
 
                 NodeList nList = doc.getElementsByTagName("item");
+
+                for(int i = 0; i < nList.getLength(); i++) {
+                    NodeList childrenNode = (NodeList) nList.item(i);
+                    Element el = (Element) childrenNode;
+                    System.out.println("-----------------------------");
+                    System.out.println(getTagValue("category", el));
+                    System.out.println(getTagValue("fcstDate", el));
+                    System.out.println(getTagValue("fcstTime", el));
+                    System.out.println(getTagValue("fcstValue", el));
+
+                    weatherRepository.save(weather);
+                }
                 System.out.println("파싱할 리스트 수 : "+ nList.getLength());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
             System.out.println("AAA");
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
         return weathers;        
     }
 
+    private static String getTagValue(String tag, Element eElement) {
+	    NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
+	    Node nValue = (Node) nlList.item(0);
+	    if(nValue == null) 
+	        return null;
+	    return nValue.getNodeValue();
+	}
 }

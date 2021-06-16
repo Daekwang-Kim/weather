@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.weather.Models.Weather;
 import com.weather.Service.WeatherService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("WeatherTest")
 public class WeatherController {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private WeatherService weatherService;
 
@@ -36,21 +33,21 @@ public class WeatherController {
         return new ResponseEntity<List<Weather>>(Weather, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{wtNo}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<Weather> getWeather(@PathVariable("wtNo") Long wtNo) {
-        Optional<Weather> Weather = weatherService.findById(wtNo);
+    @GetMapping(value = "/{fcstDate}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<Weather> getWeather(@PathVariable("fcstDate") String fcstDate) {
+        Optional<Weather> Weather = weatherService.findByFcstDate(fcstDate);
         return new ResponseEntity<Weather>(Weather.get(), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{wtNo}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<Void> deleteWeather(@PathVariable("wtNo") Long wtNo) {
-        weatherService.deleteById(wtNo);
+    @DeleteMapping(value = "/{fcstDate}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<Void> deleteWeather(@PathVariable("fcstDate") String fcstDate) {
+        weatherService.deleteByFcstDate(fcstDate);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping(value = "/{wtNo}", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<Weather> updateWeather(@PathVariable("wtNo") Long wtNo, Weather Weather) {
-        weatherService.updateById(wtNo, Weather);
+    @PutMapping(value = "/{fcstDate}", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<Weather> updateWeather(@PathVariable("fcstDate") String fcstDate, Weather Weather) {
+        weatherService.updateByFcstDate(fcstDate, Weather);
         return new ResponseEntity<Weather>(Weather, HttpStatus.OK);
     }
 
